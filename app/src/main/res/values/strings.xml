@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- MainActivity -->
+    <string name="app_name">Landtiger Steuerung</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="action_discover">Suche nach Geräten</string>
+    <string name="not_connected">Es besteht keine Verbindung zu einem Gerät</string>
+    <string name="bt_not_enabled_leaving">Bluetooth wurde nicht aktiviert. Die Anwendung wurde beendet.</string>
+    <string name="title_connecting">verbinden&#8230;</string>
+    <string name="title_connected_to">verbunden mit:&#160;</string>
+    <string name="title_not_connected">nicht verbunden</string>
+    <string name="button_led1">LED1</string>
+
+    <!-- DeviceListActivity -->
+    <string name="title_activity_device_list">DeviceListActivity</string>
+    <string name="scanning">Die Suche nach Geräten läuft&#8230;</string>
+    <string name="select_device">Wähle ein Gerät</string>
+    <string name="none_paired">Es existieren noch keine gekoppelten Geräte</string>
+    <string name="title_paired_devices">Bereits gekoppelte Geräte</string>
+    <string name="title_new_devices">Neue Geräte</string>
+
+    <!-- GPIOFragment -->
+    <string name="title_activity_gpio">GPIOActivity</string>
+    <string name="gpio">LED Steuerung</string>
+    <string name="p2.0">P2.0 (LD11)</string>
+    <string name="p2.1">P2.1 (LD10)</string>
+    <string name="p2.2">P2.2 (LD9)</string>
+    <string name="p2.3">P2.3 (LD8)</string>
+    <string name="p2.4">P2.4 (LD7)</string>
+    <string name="p2.5">P2.5 (LD6)</string>
+    <string name="p2.6">P2.6 (LD5)</string>
+    <string name="p2.7">P2.7 (LD4)</string>
+
+    <!-- ADCFragment -->
+    <string name="adc">Analog-Digital-Wandler </string>
+    <string name="currentValue">Aktuelle Spannung:&#160;</string>
+    <string name="meanValue">Mittelwert:&#160;</string>
+
+
+    <!-- SendImageFragment -->
+    <string name="sendButton">Bild senden</string>
+    <string name="captureButton">Auslösen</string>
+    <string name="newButton">Neues Bild</string>
+
+    <!-- Bilder Beschreibungen -->
+    <string name="hsMannheimLogo">Logo der HS Mannheim</string>
+
+</resources>
