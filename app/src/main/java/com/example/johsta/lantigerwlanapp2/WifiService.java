@@ -1,5 +1,6 @@
 package com.example.johsta.lantigerwlanapp2;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,7 +30,7 @@ public class WifiService {
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
-    public WifiService(Handler handler) {
+    public WifiService(Context context, Handler handler) {
         mHandler = handler;
         mState = STATE_NONE;
     }

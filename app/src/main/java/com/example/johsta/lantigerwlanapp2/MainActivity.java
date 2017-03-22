@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,7 +21,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
 
     // Debugging
     private static final String TAG = "MainActivity";
-    private static final boolean D = true;
+    private static final boolean D  = true;
 
     // Message types sent from the WifiService Handler
     public static final int MESSAGE_STATE_CHANGE    = 1;
@@ -37,9 +38,10 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
     private ActionBar mActionBar;
 
     //Wifi and WebSockets
-    private WifiInfo wifiInfo           = null;
-    private WebSocketClient client      = null;
+    private WifiInfo mWifiInfo           = null;
+    private WebSocketClient mWebSocketClient      = null;
     private WifiService mWifiService    = null;
+    private WifiManager mWifiManager    = null;
 
 /*    // Name of the connected device
     private String mConnectedDeviceName = null;
@@ -87,6 +89,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
             finish();
             return;
         }*/ //Fixme getNetworkId()
+
 /*        mActionBar = getActionBar();
         mActionBar.setSubtitle(R.string.title_not_connected);*/ //Fixme ActionBar
     }
@@ -143,7 +146,14 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
             Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }*/ //Fixme senden von Messages
-        if (mWifiService.getState() != WifiService.STATE_CONNECTED) {
+
+        // Check that we're actually connected before trying anything
+        if (mWifiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
+            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (mWifiManager.getWifiState() != WifiManager.WIFI_STATE_ENABLED) {
             Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -184,7 +194,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
             Intent serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
             return true;
-        }*/ //TODO Einbinden???
+        }*/ //TODO DeviceListActivity Einbinden???
 
         return super.onOptionsItemSelected(item);
     }
@@ -249,12 +259,12 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
         switch (requestCode) {
 
             case REQUEST_ENABLE_WIFI:
-                // When the request to enable Bluetooth returns
+                // When the request to enable Wifi returns
                 if (resultCode == Activity.RESULT_OK) {
-                    // Bluetooth is now enabled, so set up a chat session
-//        setupActivity();
+                    // Wifi is now enabled, so set up a chat session
+//                      setupActivity();
                 } else {
-                    // User did not enable Bluetooth or an error occured
+                    // User did not enable Wifi or an error occured
                     Log.d(TAG, "Wifi not enabled");
                     Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
                     finish();
