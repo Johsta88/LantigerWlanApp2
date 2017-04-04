@@ -44,7 +44,7 @@ public class GPIOFragment extends Fragment implements View.OnClickListener{
             mWifiListener = (OnSendWifiMessageListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnSendBluetoothMessageListener");
+                    + " must implement OnSendWifiMessageListener");
         }
     }
 

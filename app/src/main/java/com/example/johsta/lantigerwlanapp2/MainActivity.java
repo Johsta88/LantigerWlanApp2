@@ -17,31 +17,33 @@ import android.widget.Toast;
 
 import com.codebutler.android_websockets.WebSocketClient;
 
-public class MainActivity extends Activity implements SwitchFragmentListener, OnSendWifiMessageListener{
+import java.net.URI;
+
+public class MainActivity extends Activity implements SwitchFragmentListener, OnSendWifiMessageListener {
 
     // Debugging
     private static final String TAG = "MainActivity";
-    private static final boolean D  = true;
+    private static final boolean D = true;
 
     // Message types sent from the WifiService Handler
-    public static final int MESSAGE_STATE_CHANGE    = 1;
-    public static final int MESSAGE_READ            = 2;
-    public static final int MESSAGE_WRITE           = 3;
-    public static final int MESSAGE_DEVICE_NAME     = 4;
-    public static final int MESSAGE_TOAST           = 5;
+    public static final int MESSAGE_STATE_CHANGE = 1;
+    public static final int MESSAGE_READ = 2;
+    public static final int MESSAGE_WRITE = 3;
+    public static final int MESSAGE_DEVICE_NAME = 4;
+    public static final int MESSAGE_TOAST = 5;
 
     // Key names received from the WifiService Handler
-    public static final String DEVICE_NAME  = "device_name";
-    public static final String TOAST        = "toast";
+    public static final String DEVICE_NAME = "device_name";
+    public static final String TOAST = "toast";
 
     // Layout Views
     private ActionBar mActionBar;
 
     //Wifi and WebSockets
-    private WifiInfo mWifiInfo           = null;
-    private WebSocketClient mWebSocketClient      = null;
-    private WifiService mWifiService    = null;
-    private WifiManager mWifiManager    = null;
+    private WifiInfo mWifiInfo = null;
+    private WebSocketClient mWebSocketClient = null;
+    private WifiService mWifiService = null;
+    private WifiManager mWifiManager = null; //TODO Ersatz für Bluetoothadapter
 
 /*    // Name of the connected device
     private String mConnectedDeviceName = null;
@@ -52,7 +54,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
     // must be greater than 0
     // system passes it back in your onActivityResult() implementation as
     // requestCode parameter
-    private static final int REQUEST_ENABLE_WIFI    = 2;
+    private static final int REQUEST_ENABLE_WIFI = 2;
     private static final int REQUEST_CONNECT_DEVICE = 1;
 
     @Override
@@ -83,15 +85,73 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
                     .add(R.id.fragment_container, firstFragment).commit();
         }
 
-        // If the adapter is -1, then Wifi is not active
-/*        if (wifiInfo.getNetworkId() == -1) {
-            Toast.makeText(this, "Connect to the ESP8266 via Wifi!", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }*/ //Fixme getNetworkId()
 
-/*        mActionBar = getActionBar();
-        mActionBar.setSubtitle(R.string.title_not_connected);*/ //Fixme ActionBar
+        mWebSocketClient = new WebSocketClient(URI.create(WsConfig.URL_WEBSOCKET /*+ URLEncoder.encode(name)*/), new WebSocketClient.Listener() {
+            @Override
+            public void onConnect() {
+                showToast("Connected to ESP");
+            }
+
+/*            *
+         * On receiving the message from web socket server
+         * */
+            @Override
+            public void onMessage(String message) {
+                Log.d(TAG, String.format("Got string message! %s", message));
+
+
+            }
+
+            @Override
+            public void onMessage(byte[] data) {
+                Log.d(TAG, String.format("Got binary message! %s", data));
+            }
+
+/*            *
+         * Called when the connection is terminated
+         * */
+            @Override
+            public void onDisconnect(int code, String reason) {
+
+                String message = String.format("Disconnected! Code: %d Reason: %s", code, reason);
+
+                showToast(message);
+
+                // clear the session id from shared preferences
+                //utils.storeSessionId(null);
+            }
+
+            @Override
+            public void onError(Exception error) {
+                Log.e(TAG, "Error! : " + error);
+
+                showToast("Error! : " + error);
+            }
+
+        }, null);
+
+        mWebSocketClient.connect();
+    }
+
+/*    *
+         * Method to send message to web socket server
+         **/
+    private void sendMessageToServer(String message) {
+        if (mWebSocketClient != null && mWebSocketClient.isConnected()) {
+            mWebSocketClient.send(message);
+        }
+    }
+
+    private void showToast(final String message) {
+
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message,
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 
@@ -127,9 +187,14 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         //Stop the Wifi service
-/*        if (client.isConnected())
-            client.disconnect();*/ //Fixme beenden der Verbindung
+        if (mWifiService != null)
+            mWifiService.stop();
+
+        if(mWebSocketClient != null & mWebSocketClient.isConnected()){
+            mWebSocketClient.disconnect();
+        }
         if (D)
             Log.e(TAG, "--- ON DESTROY ---");
     }
@@ -141,19 +206,13 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
      *          A string of text to send.
      */
     private void sendMessage(String message) {
-/*        // Check that we're actually connected before trying anything
-        if(wifiInfo.getNetworkId() == -1) {
-            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
-            return;
-        }*/ //Fixme senden von Messages
-
         // Check that we're actually connected before trying anything
-        if (mWifiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
+        if(mWifiService == null) {
             Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (mWifiManager.getWifiState() != WifiManager.WIFI_STATE_ENABLED) {
+        if (mWifiService.getState() != WifiService.STATE_CONNECTED) {
             Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -162,7 +221,8 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
         if (message.length() > 0) {
             // Get the message bytes and send it
             byte[] send = message.getBytes();
-            mWifiService.write(send);
+            mWebSocketClient.send(send);//TODO Ohne WifiService
+            //mWifiService.write(send);
 
             // // Reset out string buffer to zero and clear the edit text field
             // mOutStringBuffer.setLength(0);
@@ -261,8 +321,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
             case REQUEST_ENABLE_WIFI:
                 // When the request to enable Wifi returns
                 if (resultCode == Activity.RESULT_OK) {
-                    // Wifi is now enabled, so set up a chat session
-//                      setupActivity();
+
                 } else {
                     // User did not enable Wifi or an error occured
                     Log.d(TAG, "Wifi not enabled");
