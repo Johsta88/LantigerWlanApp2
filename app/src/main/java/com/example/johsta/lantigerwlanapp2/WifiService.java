@@ -1,10 +1,14 @@
 package com.example.johsta.lantigerwlanapp2;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.codebutler.android_websockets.WebSocketClient;
+
+import java.net.URI;
 
 
 public class WifiService {
@@ -18,6 +22,7 @@ public class WifiService {
     private WebSocketClient mClient;
     private int mState;
 
+/*    private ConnectedThread mConnectedThread = null;*/
 
     //Connection states
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -25,11 +30,9 @@ public class WifiService {
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
 
-    public WifiService(Context context, Handler handler, WebSocketClient client) {
+    public WifiService(Context context, Handler handler) {
         mHandler = handler;
-        mClient = client;
         mState = STATE_NONE;
-
 
     }
 
@@ -39,9 +42,10 @@ public class WifiService {
 
     /**
      * Set the current state of the chat connection
-     * @param state  An integer defining the current connection state
+     *
+     * @param state An integer defining the current connection state
      */
-    private synchronized void setState(int state) {
+    private void setState(int state) {
         if (D) Log.d(TAG, "setState() " + mState + " -> " + state);
         mState = state;
 
@@ -50,51 +54,104 @@ public class WifiService {
     }
 
     /**
-     * Return the current connection state. */
-    public synchronized int getState() {
+     * Return the current connection state.
+     */
+    public int getState() {
         return mState;
     }
 
     /**
      * Connect to an WebSocket
      */
-    public  synchronized void connect(){
+    public void connect() {
+        if (D) Log.d(TAG, "connect");
 
+        mClient = new WebSocketClient(URI.create(WsConfig.URL_WEBSOCKET), new WebSocketClient.Listener() {
+            @Override
+            public void onConnect() {
+                // Send the name of the connected device back to the UI Activity
+                Message msg = mHandler.obtainMessage(MainActivity.MESSAGE_DEVICE_NAME);
+                Bundle bundle = new Bundle();
+                bundle.putString(MainActivity.TOAST, "onConnect WifiService");
+                msg.setData(bundle);
+                mHandler.sendMessage(msg);
+
+                setState(STATE_CONNECTED);
+            }
+
+            /**
+             * On receiving the message from web socket server
+             **/
+            @Override
+            public void onMessage(String message) {
+                Log.d(TAG, String.format("Got string message! %s", message));
+
+                byte[] data = message.getBytes();
+                mHandler.obtainMessage(MainActivity.MESSAGE_READ, data).sendToTarget();
+            }
+
+            @Override
+            public void onMessage(byte[] data) {
+                Log.d(TAG, String.format("Got binary message! %s", data));
+
+                mHandler.obtainMessage(MainActivity.MESSAGE_READ, data).sendToTarget();
+            }
+
+            /*            *
+                     * Called when the connection is terminated
+                     * */
+            @Override
+            public void onDisconnect(int code, String reason) {
+
+                // Send a failure message back to the Activity
+                setState(STATE_NONE);
+                Message msg = mHandler.obtainMessage(MainActivity.MESSAGE_TOAST);
+                Bundle bundle = new Bundle();
+                bundle.putString(MainActivity.TOAST, "onDisconnect WifiService");
+                msg.setData(bundle);
+                mHandler.sendMessage(msg);
+
+                // clear the session id from shared preferences
+                //utils.storeSessionId(null);
+            }
+
+            @Override
+            public void onError(Exception error) {
+                Log.e(TAG, "Error! : " + error);
+
+                // Send a failure message back to the Activity
+                setState(STATE_NONE);
+                Message msg = mHandler.obtainMessage(MainActivity.MESSAGE_TOAST);
+                Bundle bundle = new Bundle();
+                bundle.putString(MainActivity.TOAST, "onError WifiService");
+                msg.setData(bundle);
+                mHandler.sendMessage(msg);
+            }
+
+        }, null);
+
+        mClient.connect();
+
+        setState(STATE_CONNECTED);
     }
 
     /**
-     * Stop Service
+     * Method to send message to web socket server
      */
-    public synchronized void stop() {
+    public void sendMessageToServer(String message) {
+        if (mClient != null && mClient.isConnected()) {
+            mClient.send("LT " + message);
 
+            byte[] bytes = message.getBytes();
+            mHandler.obtainMessage(MainActivity.MESSAGE_WRITE, -1, -1, bytes).sendToTarget();
+        }
     }
 
-    /**
-     * Write to an WebSocket
-     */
-    public void write(byte[] bytes){
+    public void sendMessageToServer(byte[] message) {
+        if (mClient != null && mClient.isConnected()) {
+            mClient.send(message.toString());
 
-    }
-
-    /**
-     * Read from an WebSocket
-     */
-    public void read(){
-
-    }
-
-    /**
-     * Indicate that the connection attempt failed and notify the UI Activity.
-     */
-    private void connectionFailed() {
-
-    }
-
-    /**
-     * Indicate that the connection was lost and notify the UI Activity.
-     */
-    private void connectionLost() {
-
+            mHandler.obtainMessage(MainActivity.MESSAGE_WRITE, -1, -1, message).sendToTarget();
+        }
     }
 }
-

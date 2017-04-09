@@ -45,7 +45,7 @@ public class ADCFragment extends Fragment {
             wifiMessageListener = (OnSendWifiMessageListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnSendBluetoothMessageListener");
+                    + " must implement OnSendWifiMessageListener");
         }
     }
 

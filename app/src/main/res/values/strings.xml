@@ -6,7 +6,8 @@
     <string name="action_settings">Einstellungen</string>
     <string name="action_discover">Suche nach Geräten</string>
     <string name="not_connected">Es besteht keine Verbindung zu einem Gerät</string>
-    <string name="bt_not_enabled_leaving">Bluetooth wurde nicht aktiviert. Die Anwendung wurde beendet.</string>
+    <string name="not_connected2">Es besteht keine Verbindung zu einem Gerät  2</string>
+    <string name="bt_not_enabled_leaving">Wifi wurde nicht aktiviert. Die Anwendung wurde beendet.</string>
     <string name="title_connecting">verbinden&#8230;</string>
     <string name="title_connected_to">verbunden mit:&#160;</string>
     <string name="title_not_connected">nicht verbunden</string>
