@@ -9,12 +9,13 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements SwitchFragmentListener, OnSendWifiMessageListener {
+public class MainActivity extends AppCompatActivity implements SwitchFragmentListener, OnSendWifiMessageListener {
 
     // Debugging
     private static final String TAG = "MainActivity";
@@ -37,6 +38,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
     //Wifi and WebSockets
     private WifiService mWifiService = null;
     public WifiManager mWifiManager = null;
+    private Boolean mState = false;
 
 
     // constant which is passed to startActivityForResult
@@ -77,8 +79,6 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
         }
 
         mActionBar = getActionBar();
-        //mActionBar.setSubtitle("test");
-
 
        if(!mWifiManager.isWifiEnabled()) {
             Toast.makeText(this, "Please connect to an ESP", Toast.LENGTH_LONG).show();
@@ -95,6 +95,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
         if(mWifiManager.isWifiEnabled()){
             mWifiService = new WifiService(this, mHandler);
             mWifiService.connect();
+            mState = true;
         }
     }
 
@@ -112,7 +113,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
         if (D)
             Log.e(TAG, "+ ON RESUME +");
 
-        if(mWifiManager.isWifiEnabled()){
+        if(mWifiManager.isWifiEnabled() && mState != true){
             mWifiService = new WifiService(this, mHandler);
             mWifiService.connect();
         }
@@ -166,8 +167,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
         if (message.length() > 0) {
             // Get the message bytes and send it
             byte[] send = message.getBytes();
-            //mWebSocketClient.send(send);//TODO Ohne WifiService
-            mWifiService.sendMessageToServer(message);//TODO Mit WifiService
+            mWifiService.sendMessageToServer(message);
 
             // // Reset out string buffer to zero and clear the edit text field
             // mOutStringBuffer.setLength(0);
@@ -210,7 +210,7 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
 
         if (mWifiService != null) {
             if (getFragmentManager().getBackStackEntryCount() == 0) {
-                sendMessage("r"); //Go to default state of the Landtiger
+                sendMessage("LTB r"); //Go to default state of the Landtiger
                 mWifiService.setHandler(mHandler);
             }
         }
@@ -236,6 +236,12 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
                 break;
             case SendImageFragment.TAG:
                 newFragment = new SendImageFragment();
+                break;
+            case ESPFragment.TAG:
+                ESPFragment espFragment = new  ESPFragment();
+                if (mWifiService != null)
+                    mWifiService.setHandler(espFragment.getHandler());
+                newFragment = espFragment;
                 break;
         }
 
@@ -320,9 +326,11 @@ public class MainActivity extends Activity implements SwitchFragmentListener, On
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    //String readMessage = new String(readBuf, 0, msg.arg1);
                     // mConversationArrayAdapter.add(mConnectedDeviceName+": " +
                     // readMessage);
+                    String readMessage = new String(readBuf);
+
                     Log.d(TAG, readMessage);
                     break;
                 case MESSAGE_DEVICE_NAME:

@@ -140,7 +140,7 @@ public class WifiService {
      */
     public void sendMessageToServer(String message) {
         if (mClient != null && mClient.isConnected()) {
-            mClient.send("LT " + message);
+            mClient.send(message);
 
             byte[] bytes = message.getBytes();
             mHandler.obtainMessage(MainActivity.MESSAGE_WRITE, -1, -1, bytes).sendToTarget();

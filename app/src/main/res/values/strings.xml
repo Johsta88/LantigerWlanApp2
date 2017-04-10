@@ -33,6 +33,13 @@
     <string name="p2.6">P2.6 (LD5)</string>
     <string name="p2.7">P2.7 (LD4)</string>
 
+    <!-- ESPFragment -->
+    <string name="title_activity_esp">ESPActivity</string>
+    <string name="ESP">ESP Steuerung</string>
+    <string name="redPin">rote LED</string>
+    <string name="bluePin">blaue LED</string>
+    <string name="greenPin">grüne LED</string>
+
     <!-- ADCFragment -->
     <string name="adc">Analog-Digital-Wandler </string>
     <string name="currentValue">Aktuelle Spannung:&#160;</string>
@@ -46,5 +53,8 @@
 
     <!-- Bilder Beschreibungen -->
     <string name="hsMannheimLogo">Logo der HS Mannheim</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

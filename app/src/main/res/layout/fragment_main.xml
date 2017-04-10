@@ -53,14 +53,23 @@
                 android:gravity="start|center_vertical"
                 style="?android:buttonBarButtonStyle"/>
 
+            <Button
+                android:id="@+id/button_esp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ESP"
+                android:drawableLeft="@drawable/led"
+                android:drawableStart="@drawable/led"
+                android:gravity="start|center_vertical"
+                style="?android:buttonBarButtonStyle"/>
         </LinearLayout>
     </ScrollView>
 
-    <!--   <ImageView  -->
-    <!--       android:id="@+id/hsMaLogo" -->
-    <!--       android:layout_width="match_parent" -->
-    <!--       android:layout_height="wrap_content" -->
-    <!--       android:src="@drawable/hsmannheimlogo" -->
-    <!--       android:contentDescription="@string/hsMannheimLogo"/> -->
+       <ImageView
+              android:id="@+id/hsMaLogo"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:src="@drawable/hsmannheimlogo"
+              android:contentDescription="@string/hsMannheimLogo"/>
 
 </LinearLayout>

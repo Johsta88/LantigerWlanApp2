@@ -42,6 +42,9 @@ public class MainFragment extends Fragment implements View.OnClickListener{
         Button sendImageButton = (Button) view.findViewById(R.id.button_sendImage);
         sendImageButton.setOnClickListener(this);
 
+        Button espButton = (Button) view.findViewById(R.id.button_esp);
+        espButton.setOnClickListener(this);
+
         return view;
     }
 
@@ -59,6 +62,10 @@ public class MainFragment extends Fragment implements View.OnClickListener{
             case R.id.button_sendImage:
                 //switch fragment
                 mCallback.switchFragment(SendImageFragment.TAG);
+                break;
+            case R.id.button_esp:
+                //switch fragment
+                mCallback.switchFragment(ESPFragment.TAG);
                 break;
         }
 

@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ToggleButton;
 
-public class GPIOFragment extends Fragment implements View.OnClickListener{
+public class ESPFragment extends Fragment implements View.OnClickListener {
 
-    public static final String TAG = "GPIOFragment";
+    public static final String TAG = "ESPFragment";
     View view;
     SwitchFragmentListener mCallback;
     OnSendWifiMessageListener mWifiListener;
@@ -30,7 +30,6 @@ public class GPIOFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
@@ -48,40 +47,29 @@ public class GPIOFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_gpio, container, false);
+        view = inflater.inflate(R.layout.fragment_esp, container, false);
 
-     mWifiListener.onSendWifiMessage("LTB 1");
-     /*Hier wird eine Menü 1 gesendet*/
+        mWifiListener.onSendWifiMessage("ESP 4");
 
         //Set button listener
-        ledButtons = new ToggleButton[8];
+        ledButtons = new ToggleButton[3];
 
-        ledButtons[0] = (ToggleButton) view.findViewById(R.id.button_p2_0);
-        ledButtons[1] = (ToggleButton) view.findViewById(R.id.button_p2_1);
-        ledButtons[2] = (ToggleButton) view.findViewById(R.id.button_p2_2);
-        ledButtons[3] = (ToggleButton) view.findViewById(R.id.button_p2_3);
-        ledButtons[4] = (ToggleButton) view.findViewById(R.id.button_p2_4);
-        ledButtons[5] = (ToggleButton) view.findViewById(R.id.button_p2_5);
-        ledButtons[6] = (ToggleButton) view.findViewById(R.id.button_p2_6);
-        ledButtons[7] = (ToggleButton) view.findViewById(R.id.button_p2_7);
+        ledButtons[0] = (ToggleButton) view.findViewById(R.id.button_redPin);
+        ledButtons[1] = (ToggleButton) view.findViewById(R.id.button_bluePin);
+        ledButtons[2] = (ToggleButton) view.findViewById(R.id.button_greenPin);
 
         for (int i = 0; i < ledButtons.length; i++) {
             ledButtons[i].setOnClickListener(this);
         }
 
-        ledViews = new ImageView[8];
+        ledViews = new ImageView[3];
 
-        ledViews[0] = (ImageView) view.findViewById(R.id.ld11_imageView);
-        ledViews[1] = (ImageView) view.findViewById(R.id.ld10_imageView);
-        ledViews[2] = (ImageView) view.findViewById(R.id.ld9_imageView);
-        ledViews[3] = (ImageView) view.findViewById(R.id.ld8_imageView);
-        ledViews[4] = (ImageView) view.findViewById(R.id.ld7_imageView);
-        ledViews[5] = (ImageView) view.findViewById(R.id.ld6_imageView);
-        ledViews[6] = (ImageView) view.findViewById(R.id.ld5_imageView);
-        ledViews[7] = (ImageView) view.findViewById(R.id.ld4_imageView);
-
+        ledViews[0] = (ImageView) view.findViewById(R.id.ld1_imageView);
+        ledViews[1] = (ImageView) view.findViewById(R.id.ld2_imageView);
+        ledViews[2] = (ImageView) view.findViewById(R.id.ld3_imageView);
 
         return view;
     }
@@ -91,11 +79,14 @@ public class GPIOFragment extends Fragment implements View.OnClickListener{
 
         int ledValue = 0;
         for (int i=0; i < ledButtons.length; i++) {
-            if(ledButtons[i].isChecked()) ledValue |= (int) Math.pow(2,i);
-            else ledValue &= (int) (0xff-Math.pow(2,i));
+            if(ledButtons[i].isChecked())
+                ledValue = (int) Math.pow(2,i);
+            else
+                ledValue &= (int) (0x7-Math.pow(2,i));
         }
 
-        mWifiListener.onSendWifiMessage("LTB " + Integer.toHexString(ledValue) + "\r\n");
+
+        mWifiListener.onSendWifiMessage("ESP LED " + Integer.toBinaryString(ledValue) + "\r\n");
     }
 
     private void setLedState(String msg) {

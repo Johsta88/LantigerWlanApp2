@@ -53,7 +53,7 @@ public class ADCFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_adc, container, false);
 
-        wifiMessageListener.onSendWifiMessage("2");
+        wifiMessageListener.onSendWifiMessage("LTB 2");
 
         //Set button listener
 //    Button buttonP2_0 = (Button) view.findViewById(R.id.button_p2_0);
@@ -149,8 +149,9 @@ public class ADCFragment extends Fragment {
                 case MainActivity.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-
+                    //String readMessage = new String(readBuf, 0, msg.arg1);
+                    //String readMessage = readBuf.toString();
+                    String readMessage = new String(readBuf);
                     appendDataToGraph(readMessage);
                     break;
                 case MainActivity.MESSAGE_DEVICE_NAME:

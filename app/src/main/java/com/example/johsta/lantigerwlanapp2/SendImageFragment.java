@@ -66,7 +66,7 @@ public class SendImageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_sendimage, container, false);
 
-        mWifiListener.onSendWifiMessage("3");
+        mWifiListener.onSendWifiMessage("LTB 3");
 
         if(checkCameraHardware(getActivity())){
             // Create an instance of Camera
@@ -257,7 +257,7 @@ public class SendImageFragment extends Fragment {
                     int color = currentBitmap.getPixel(i, j);// & 0x00ffffff;
                     color = (((color>>3) & 0x1f) | ((color>>5) & 0x7e0) | ((color>>8) & 0xf800)) & 0xffff;
 
-                    mWifiListener.onSendWifiMessage(Integer.toHexString(color) +"\r\n");
+                    mWifiListener.onSendWifiMessage("LTB "+ Integer.toHexString(color) +"\r\n");
 
                     progressDialog.incrementProgressBy(1);
                     if(runFlag == false) return;
