@@ -52,7 +52,7 @@ public class GPIOFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_gpio, container, false);
 
-     mWifiListener.onSendWifiMessage("LTB 1");
+     mWifiListener.onSendWifiMessage("LTB 1\n");
      /*Hier wird eine Menü 1 gesendet*/
 
         //Set button listener
